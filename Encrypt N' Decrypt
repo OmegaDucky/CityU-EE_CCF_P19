@@ -1,0 +1,186 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System;
+using System.Linq;
+using UnityEngine.UI;
+using TMPro;
+
+public class TheScript : MonoBehaviour
+{
+    string[] alphabet = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
+    List<string> exchangeChart = new List<string>();
+
+    public Text textTextBox;
+    public Text keyTextBox;
+    public Text ouputText;
+    
+    void Awake()
+    {
+        List<string> exchangeChart = new List<string>(alphabet);
+    }
+
+    public void Encrypt(){
+        int trykey;
+        if(int.TryParse(keyTextBox.text, out trykey)){
+            //plain cuz just numbers have been inputed
+            PlainCaesarEncrypt(textTextBox.text, trykey);
+            
+        }
+        else{
+            //remove number from text then use text as key
+            string keyC = "";
+            foreach(var charc in keyTextBox.text){
+                int s;
+                if(!int.TryParse(charc.ToString(), out s)){
+                    keyC = keyC + charc;
+                }
+            }
+
+            //removed
+            KeyedCaesarEncrypt(textTextBox.text, keyC);
+            Debug.Log("keyed");
+        }
+    }
+
+    public void Decrypt(){
+        int trykey;
+        if(int.TryParse(keyTextBox.text, out trykey)){
+            //plain cuz just numbers have been inputed
+            PlainCaesarDecrypt(textTextBox.text, trykey);
+        }
+        else{
+            //remove number from text then use text as key
+            string keyC = "";
+            foreach(var charc in keyTextBox.text){
+                int s;
+                if(!int.TryParse(charc.ToString(), out s)){
+                    keyC = keyC + charc;
+                }
+            }
+
+            //removed
+            KeyedCaesarDecrypt(textTextBox.text, keyC);
+        }
+    }
+
+    public void PlainCaesarEncrypt(string plainText, int key){
+        if(key > 26){
+            key = key % 26;
+        }
+
+        exchangeChart = new List<string>(alphabet);
+
+        string ciphertext = "";
+
+        foreach(var charc in plainText){
+            if(Array.IndexOf(alphabet, charc.ToString().ToLower()) != -1){
+                string newchar = alphabet[(Array.IndexOf(alphabet, charc.ToString().ToLower())+key)%26];
+                if(Char.IsUpper(charc)){
+                    newchar = newchar.ToUpper();
+                }
+                ciphertext = ciphertext + newchar;
+            }
+            else{
+                ciphertext = ciphertext + charc;
+            }
+        }
+
+        ouputText.text = ciphertext;
+    }
+    
+    public void PlainCaesarDecrypt(string plainText, int key){
+        if(key > 26){
+            key = key % 26;
+        }
+
+        exchangeChart = new List<string>(alphabet);
+
+        string ciphertext = "";
+
+        foreach(var charc in plainText){
+            if(Array.IndexOf(alphabet, charc.ToString().ToLower()) != -1){
+                int newCharIndex = Array.IndexOf(alphabet, charc.ToString().ToLower())-key;
+                if(newCharIndex < 0){
+                    newCharIndex += 26;
+                }
+                string newchar = alphabet[newCharIndex];
+                if(Char.IsUpper(charc)){
+                    newchar = newchar.ToUpper();
+                }
+                ciphertext = ciphertext + newchar;
+            }
+            else{
+                ciphertext = ciphertext + charc;
+            }
+        }
+
+        ouputText.text = ciphertext;
+    }
+
+    public void KeyedCaesarEncrypt(string plainText, string key){
+        int keylength = key.Length;
+        int i = 0;
+
+        string ciphertext = "";
+
+        foreach(var charc in plainText){
+            if(Array.IndexOf(alphabet, charc.ToString().ToLower()) != -1){
+                int wekey = Array.IndexOf(alphabet, key[i].ToString().ToLower());
+
+                string newchar = alphabet[(Array.IndexOf(alphabet, charc.ToString().ToLower())+wekey)%26];
+
+                if(Char.IsUpper(charc)){
+                    newchar = newchar.ToUpper();
+                }
+
+                ciphertext = ciphertext + newchar;
+
+                i += 1;
+                if(i >= keylength){
+                    i = 0;
+                }
+            }
+            else{
+                ciphertext = ciphertext + charc;
+            }
+        }
+
+        ouputText.text = ciphertext;
+    }
+
+    public void KeyedCaesarDecrypt(string plainText, string key){
+        int keylength = key.Length;
+        int i = 0;
+
+        string ciphertext = "";
+
+        foreach(var charc in plainText){
+            if(Array.IndexOf(alphabet, charc.ToString().ToLower()) != -1){
+                int wekey = Array.IndexOf(alphabet, key[i].ToString().ToLower());
+
+                int newCharIndex = Array.IndexOf(alphabet, charc.ToString().ToLower())-wekey;
+                if(newCharIndex < 0){
+                    newCharIndex += 26;
+                }
+                string newchar = alphabet[newCharIndex];
+
+                if(Char.IsUpper(charc)){
+                    newchar = newchar.ToUpper();
+                }
+
+                ciphertext = ciphertext + newchar;
+
+                i += 1;
+                if(i >= keylength){
+                    i = 0;
+                }
+            }
+            else{
+                ciphertext = ciphertext + charc;
+            }
+        }
+
+        ouputText.text = ciphertext;
+    }
+}
